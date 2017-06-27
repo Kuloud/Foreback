@@ -3,6 +3,7 @@ package com.kuloud.android.foreback;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -50,21 +51,25 @@ public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityResumed(Activity activity) {
-        if (!activities.contains(activity.getLocalClassName())) {
+        if (!activities.contains(getActivityTag(activity))) {
             if (!isAppForeground()) {
                 // 从后台状态进入前台
                 for (ForebackListener listener : listeners.getRegedit()) {
                     listener.onEnterForeground();
                 }
             }
-            activities.add(activity.getLocalClassName());
+            activities.add(getActivityTag(activity));
         }
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-        if (activities.contains(activity.getLocalClassName())) {
-            activities.remove(activity.getLocalClassName());
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+        if (activities.contains(getActivityTag(activity))) {
+            activities.remove(getActivityTag(activity));
             if (!isAppForeground()) {
                 // 从前台状态进入后台
                 for (ForebackListener listener : listeners.getRegedit()) {
@@ -72,11 +77,6 @@ public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
                 }
             }
         }
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-
     }
 
     @Override
@@ -99,6 +99,10 @@ public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
 
     public void removeTrackListener(ForebackListener listener) {
         listeners.remove(listener);
+    }
+
+    private String getActivityTag(@NonNull Activity activity) {
+        return activity.getLocalClassName() + activity.hashCode();
     }
 
     /**
