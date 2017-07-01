@@ -3,7 +3,7 @@ Tracks app's foreback status.
 
 ## How do I use Foreback?
 
-**1、Copy "ForebackTracker.java" into your project**
+**1、Copy Foreback libary files into your project**
 
 **2、Init when app launched**
 ````
