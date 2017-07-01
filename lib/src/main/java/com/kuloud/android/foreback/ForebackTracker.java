@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 
 public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
+    private static final String TAG = "ForebackTracker";
     private static ForebackTracker sTracker;
 
     private List<String> activities = new CopyOnWriteArrayList();
@@ -41,16 +43,11 @@ public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
+        Log.d(TAG, "onActivityStarted " + getActivityTag(activity));
         if (!activities.contains(getActivityTag(activity))) {
             if (!isAppForeground()) {
                 // 从后台状态进入前台
@@ -63,11 +60,17 @@ public class ForebackTracker implements Application.ActivityLifecycleCallbacks {
     }
 
     @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
     public void onActivityPaused(Activity activity) {
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
+        Log.d(TAG, "onActivityStopped " + getActivityTag(activity));
         if (activities.contains(getActivityTag(activity))) {
             activities.remove(getActivityTag(activity));
             if (!isAppForeground()) {
